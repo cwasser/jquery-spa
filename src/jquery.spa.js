@@ -10,6 +10,7 @@
     return this.each(function (i) {
       // Do something to each selected element.
       $(this).html('jquerySpa' + i);
+      $(this).html('Hallo ich bin ein Test');
     });
   };
 }(jQuery));

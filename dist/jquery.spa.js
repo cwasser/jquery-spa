@@ -1,11 +1,16 @@
-/*! jquery.spa - v0.0.1 - 2016-02-10
-* https://github.com/cwasser/jquery-spa#readme
-* Copyright (c) 2016 Christian Wasser; Licensed MIT */
+/*
+ * 
+ * 
+ *
+ * Copyright (c) 2016 Christian Wasser
+ * Licensed under the MIT license.
+ */
 (function ($) {
   $.fn.jquerySpa = function () {
     return this.each(function (i) {
       // Do something to each selected element.
       $(this).html('jquerySpa' + i);
+      $(this).html('Hallo ich bin ein Test');
     });
   };
 }(jQuery));
