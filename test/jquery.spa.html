@@ -6,18 +6,15 @@
     <!-- Load local jQuery. -->
     <script src="../node_modules/jquery/dist/jquery.min.js"></script>
     <!-- Load local lib and tests. -->
-    <script src="../src/jquery.spa.js"></script>
-    <!-- Removing access to jQuery and $. But it'll still be available as _$, if
-         you REALLY want to mess around with jQuery in the console. REMEMBER WE
-         ARE TESTING A PLUGIN HERE, THIS HELPS ENSURE BEST PRACTICES. REALLY. -->
-    <script>window._$ = jQuery.noConflict(true);</script>
+    <script src="../dist/jquery.spa.js"></script>
   </head>
   <body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture">
-      <span>lame test markup</span>
-      <span>normal test markup</span>
-      <span>awesome test markup</span>
-    </div>
+    <div id="test"></div>
+
+  <script type="javascript">
+    $(document).ready(function(){
+
+    });
+  </script>
   </body>
 </html>
