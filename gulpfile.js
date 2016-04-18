@@ -26,14 +26,14 @@ var gulp = require('gulp'),
     map = require('map-stream'),
     // making AMD modules ready for the browser
     browserify = require('browserify'),
-    // vinyl-source-stream and buffer to use the stream of non gulp plugins
+    // vinyl-source-stream to use the stream of non gulp plugins
     source = require('vinyl-source-stream'),
     // reactify
     reactify = require('reactify');
 
 
 var DEST = './dist/',
-    SRC_FILES = ['./src/spa/Data.js', './src/spa/History.js', './src/spa/Router.js', './src/spa/App.js','./src/spa.js'],
+    SRC_FILES = ['./src/spa/Data.js', './src/spa/History.js', './src/spa/Router.js','./src/spa.js'],
     SRC_FILES_ALL = ['./src/**/*.js'],
     BROWSERIFY_OPTS = {
         entries : SRC_FILES,
