@@ -37,7 +37,13 @@ module.exports = (function ( $ ){
             username : opts.username,
             processData : !!( $.isEmptyObject( opts.data ) ),
             success : function ( data, textStatus, jqXHR ) {
-                // Push data into History for the state here History.pushToState(route, data)
+                // The data needs to be an object for the state,
+                // so it needs to be mapped into one because data could be also an array or string
+                var stateData = {
+                    payload : data
+                };
+                $(window).trigger('jQuery.spa.currentStateUpdate', stateData);
+
                 console.log('-- Data received --');
                 console.log(data);
                 console.log(textStatus);
