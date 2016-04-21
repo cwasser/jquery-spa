@@ -26,7 +26,7 @@
 
             hasStarted = false,
 
-            configModule, addRoute, removeRoute, navigate, run;
+            configModule, addRoute, removeRoute, navigate, createResource, updateResource, deleteResource, run;
         //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
         //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
         //------------------------- END INTERNAL METHODS --------------------------------------------
@@ -46,12 +46,43 @@
             }
         };
 
-        //Proxy Router.navigate()
-        navigate = function ( route, httpMethod ) {
+        /**
+         * This function will navigate to the given route.
+         * Depending on the routing configuration will additionally try to fetch
+         * additional information for the route via GET from the in the Data module
+         * configured server.
+         * @throws exception if the spa is not started yet (spa.run())
+         * @param route
+         */
+        navigate = function ( route ) {
             if ( hasStarted ) {
-                Router.navigate(route, httpMethod);
+                Router.navigate( route );
             } else {
                 throw 'Method spa.navigate() can not be called without starting the plugin, please call spa.run() before';
+            }
+        };
+
+        createResource = function ( route, data ) {
+            if ( hasStarted ) {
+                Router.createResource( route, data );
+            } else {
+                throw 'Method spa.createResource() can not be called without starting the plugin, please call spa.run() before';
+            }
+        };
+
+        updateResource = function ( route, data ) {
+            if ( hasStarted ) {
+                Router.updateResource( route, data );
+            } else {
+                throw 'Method spa.updateResource() can not be called without starting the plugin, please call spa.run() before';
+            }
+        };
+
+        deleteResource = function ( route ) {
+            if ( hasStarted ) {
+                Router.deleteResource( route );
+            } else {
+                throw 'Method spa.deleteResource() can not be called without starting the plugin, please call spa.run() before';
             }
         };
 
@@ -85,6 +116,9 @@
             addRoute : addRoute,
             removeRoute : removeRoute,
             navigate : navigate,
+            createResource : createResource,
+            updateResource : updateResource,
+            deleteResource : deleteResource,
             run : run,
             Data : Data,
             History : History,

@@ -14,10 +14,11 @@ module.exports = (function ( $ ){
     },
         stateMap = $.extend( true, {}, defaults),
         allowedMethods = ['GET', 'POST', 'PUT', 'DELETE'],
+        History = require('./History'),
 
-        initialized = false,
+        configured = false,
 
-        configModule, loadData, _performAjaxRequest;
+        configModule, performRequest, _performAjaxRequest, isConfigured;
     //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
     //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
     _performAjaxRequest = function ( route, method, callback, opts ) {
@@ -27,7 +28,14 @@ module.exports = (function ( $ ){
             dataType : opts.format,
             error : function ( jqXHR, textStatus, errorThrown) {
                 var data = {};
-                // try to get the latest data from the history state History.getDataForCurrentRoute(route);
+                // try to get the latest data from the history state if the data is set;
+                if (
+                        typeof opts.useHistoryStateFallback !== 'undefined' &&
+                        !! opts.useHistoryStateFallback
+                   )
+                {
+                    data = History.getDataForCurrentState( route );
+                }
                 console.log('-- AJAX fail');
                 console.log(errorThrown + ' : ' + textStatus);
                 callback(data);
@@ -42,13 +50,21 @@ module.exports = (function ( $ ){
                 var stateData = {
                     payload : data
                 };
-                $(window).trigger('jQuery.spa.currentStateUpdate', stateData);
+
+                // Triggers a history state update for the current URL, this should be only used by the plugin
+                // itself
+                if (
+                    typeof opts.shouldTriggerStateUpdate !== 'undefined' &&
+                    opts.shouldTriggerStateUpdate
+                ) {
+                    History.updateCurrentState( route, stateData );
+                }
 
                 console.log('-- Data received --');
                 console.log(data);
                 console.log(textStatus);
                 console.log(jqXHR);
-                callback(data);
+                callback( stateData.payload);
             },
             timeout : opts.timeout
         });
@@ -57,16 +73,22 @@ module.exports = (function ( $ ){
     //------------------------- BEGIN EVENT METHODS ---------------------------------------------
     //------------------------- END EVENT METHODS -----------------------------------------------
     //------------------------- BEGIN PUBLIC METHODS --------------------------------------------
-    loadData = function ( route, method, callback, options ){
+    performRequest = function ( route, method, callback, options ){
         // validate options for the AJAX request here
-        if ( $.inArray( method.toUpperCase(), allowedMethods ) >= 0 ){
+        if ( $.inArray( method.toUpperCase(), allowedMethods ) >= 0 ) {
             var opts = $.extend( true, stateMap, options );
-            if ( callback !== null && typeof callback === 'function') {
+
+            if ( callback !== null && typeof callback === 'function' ) {
                 _performAjaxRequest( route, method, callback, opts );
                 return true;
             }
+
         }
         return false;
+    };
+
+    isConfigured = function () {
+        return configured;
     };
 
     configModule = function ( options ) {
@@ -77,13 +99,14 @@ module.exports = (function ( $ ){
         stateMap = $.extend( true, stateMap, options );
         console.log('configModule: successfully configurated');
 
-        if ( !initialized ) {
-            initialized = true;
+        if ( !configured ) {
+            configured = true;
         }
     };
     //------------------------- END PUBLIC METHODS ----------------------------------------------
     return {
         configModule : configModule,
-        loadData : loadData
+        isConfigured : isConfigured,
+        performRequest : performRequest
     };
 }( window.jQuery ));

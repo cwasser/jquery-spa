@@ -11,33 +11,20 @@ module.exports = (function ( $ ){
         hasHistoryApi : !!(window.history && history.pushState),
         location : typeof window !== 'undefined' ? window.location : null,
         history : !!(window.history && history.pushState) ? window.history : null,
-        useHashChange : false,
         useHistoryApi : true,
-        historyHashStates : []
+        historyHashStates : {}
     },
         stateMap = $.extend( true, {}, defaults),
 
-        initialized = false,
+        configured = false,
 
-        _onLocationChange, _onCurrentStateUpdate, _findHashState, _loadRoute,
-        configModule, navigate, run;
+        _onLocationChange, _findHashState, _loadRoute,
+        configModule, isConfigured, updateCurrentState, getDataForCurrentState, navigate, run;
     //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
     //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
-    _findHashState = function ( route ) {
-        var hashStates = $.extend(true, [], stateMap.historyHashStates);
-
-        return _.findIndex(
-            hashStates.reverse(),
-            {
-                route : route
-            }
-        );
-    };
-
-    _loadRoute = function ( route, state ) {
+    _loadRoute = function ( route ) {
         $(window).trigger('jQuery.spa.locationChange', {
-            route : state.route,
-            httpMethod : state.httpMethod
+            route : route
         });
     };
 
@@ -47,82 +34,31 @@ module.exports = (function ( $ ){
         console.log(stateMap);
         if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ) {
             $(window).on('popstate', function ( event ) {
-                var state;
 
                 console.log('History: POPSTATE triggered with event: ');
                 console.log(event);
                 console.log(stateMap.history.state);
 
-                if ( stateMap.history.state === null)
-                {
-                    stateMap.history.state = {
-                        route : window.location.pathname,
-                        data : {},
-                        httpMethod : 'GET'
-                    };
-                }
-                state = stateMap.history.state;
-
-                _loadRoute( state.route, state );
+                _loadRoute( window.location.pathname );
             });
         } else {
             $(window).on('hashchange', function ( event ) {
-                var route = window.location.hash.substring(2),
-                    stateIndex = _findHashState(route),
-                    state;
+                var route = window.location.hash.substring(2);
                 console.log('History: HASHCHANGE triggered with event: ');
                 console.log(event);
 
-                if ( stateIndex < 0 ) {
-                    stateMap.historyHashStates.push({
-                        route : route,
-                        data : {},
-                        httpMethod : 'GET'
-                    });
-                    stateIndex = 0;
+                if ( !stateMap.historyHashStates.hasOwnProperty( route ) ) {
+                    stateMap.historyHashStates[route] = {};
                 }
-                state = stateMap.historyHashStates[stateIndex];
 
-                _loadRoute( state.route, state );
+                _loadRoute( route );
             });
         }
-    };
-
-    _onCurrentStateUpdate = function () {
-        $(window).on('jQuery.spa.currentStateUpdate', function ( event, data ){
-            console.log('------- onCurrentStateUpdate ----------- ');
-            console.log('NEW STATE');
-            console.log(data);
-            console.log('OLD STATE');
-            var oldState, currentState;
-            if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ) {
-                console.log(stateMap.history.state);
-                oldState = stateMap.history.state;
-                currentState = {
-                    route : oldState.route,
-                    data : data,
-                    httpMethod : oldState.httpMethod
-                };
-
-                stateMap.history.replaceState(currentState, null, currentState.route ); //window.localtion.pathname später durch state.route ersetzen?
-            } else {
-                var lastIndex = stateMap.historyHashStates.length - 1;
-                console.log(stateMap.historyHashStates[lastIndex]);
-                oldState = stateMap.historyHashStates[lastIndex];
-                currentState = {
-                    route : oldState.route,
-                    data : data,
-                    httpMethod : oldState.httpMethod
-                };
-                stateMap.historyHashStates[lastIndex] = currentState;
-            }
-        });
     };
     //------------------------- END EVENT METHODS -----------------------------------------------
     //------------------------- BEGIN PUBLIC METHODS --------------------------------------------
     run = function () {
         _onLocationChange();
-        _onCurrentStateUpdate();
 
         if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ){
             $(window).trigger('popstate');
@@ -131,29 +67,54 @@ module.exports = (function ( $ ){
         }
     };
 
-    navigate = function ( route, httpMethod ){
+    navigate = function ( route ){
         console.log("History.navigate: Called");
-        console.log("History.navigate: Route is: " + route + " , HTTP method is: " + httpMethod);
+        console.log("History.navigate: Route is: " + route );
         if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ){
             stateMap.history.pushState({
                 route : route,
-                data : {},
-                httpMethod : httpMethod
+                data : {}
             }, null, route);
 
             // Popstate needs to be triggered since it is usually only triggered by history back- and forward-buttons
             $(window).trigger('popstate');
 
         } else {
-            stateMap.historyHashStates.push({
-                route : route,
-                data : {},
-                httpMethod : httpMethod
-            });
+            stateMap.historyHashStates[route] = {};
 
             window.location = '/#!' + route;
         }
-        // Location change here!
+    };
+
+    getDataForCurrentState = function ( route ) {
+        var data = {};
+        if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ) {
+            if ( stateMap.history.state !== null && typeof stateMap.history.state.hasOwnProperty('payload') ) {
+                data = stateMap.history.state.payload;
+            }
+        } else {
+            if ( stateMap.historyHashStates.hasOwnProperty( route ) ) {
+                data = stateMap.historyHashStates[route];
+            }
+        }
+        return data;
+    };
+
+    updateCurrentState = function ( route, data ) {
+        if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ) {
+            stateMap.history.replaceState( data, null, route );
+            return true;
+        } else {
+            if ( stateMap.historyHashStates.hasOwnProperty( route ) ) {
+                stateMap.historyHashStates[route] = data;
+                return true;
+            }
+        }
+        return false;
+    };
+
+    isConfigured = function () {
+        return configured;
     };
 
     configModule = function ( options ) {
@@ -164,14 +125,17 @@ module.exports = (function ( $ ){
         stateMap = $.extend( true, stateMap, options );
         console.log("configModule: successfully configurated");
 
-        if ( !initialized ) {
-            initialized = true;
+        if ( !configured ) {
+            configured = true;
         }
     };
     //------------------------- END PUBLIC METHODS ----------------------------------------------
     return {
         configModule : configModule,
+        isConfigured : isConfigured,
         navigate : navigate,
+        getDataForCurrentState : getDataForCurrentState,
+        updateCurrentState : updateCurrentState,
         run : run
     };
 }( window.jQuery ));
