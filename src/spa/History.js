@@ -18,7 +18,7 @@ module.exports = (function ( $ ){
 
         configured = false,
 
-        _onLocationChange, _findHashState, _loadRoute,
+        _onLocationChange, _shouldUpdateCurrentLocation, _loadRoute,
         configModule, isConfigured, updateCurrentState, getDataForCurrentState, navigate, run;
     //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
     //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
@@ -26,6 +26,16 @@ module.exports = (function ( $ ){
         $(window).trigger('jQuery.spa.locationChange', {
             route : route
         });
+    };
+
+    _shouldUpdateCurrentLocation = function ( route ) {
+        var currentRoute;
+        if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ) {
+            currentRoute = window.location.pathname;
+        } else {
+            currentRoute = window.location.hash.substring(2);
+        }
+        return route !== currentRoute;
     };
 
     //------------------------- END INTERNAL METHODS --------------------------------------------
@@ -44,12 +54,20 @@ module.exports = (function ( $ ){
         } else {
             $(window).on('hashchange', function ( event ) {
                 var route = window.location.hash.substring(2);
+
+                // In cases if we landing on the page without any URI, we have no route, so in cases
+                // of an empty route, simply set it to the root
+                if ( route === '' ) {
+                    route = '/';
+                }
+                // Creating an empty entry within the stateMap for hashRoutes in case if there is no
+                // existing one.
+                if ( !stateMap.historyHashStates.hasOwnProperty( route ) ) {
+                    stateMap.historyHashStates[ route ] = {};
+                }
+
                 console.log('History: HASHCHANGE triggered with event: ');
                 console.log(event);
-
-                if ( !stateMap.historyHashStates.hasOwnProperty( route ) ) {
-                    stateMap.historyHashStates[route] = {};
-                }
 
                 _loadRoute( route );
             });
@@ -71,17 +89,19 @@ module.exports = (function ( $ ){
         console.log("History.navigate: Called");
         console.log("History.navigate: Route is: " + route );
         if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ){
-            stateMap.history.pushState({
-                route : route,
-                data : {}
-            }, null, route);
-
+            if ( _shouldUpdateCurrentLocation( route ) ) {
+                stateMap.history.pushState({
+                    route : route,
+                    data : {}
+                }, null, route);
+            }
             // Popstate needs to be triggered since it is usually only triggered by history back- and forward-buttons
             $(window).trigger('popstate');
 
         } else {
-            stateMap.historyHashStates[route] = {};
-
+            if ( _shouldUpdateCurrentLocation( route ) ) {
+                stateMap.historyHashStates[route] = {};
+            }
             window.location = '/#!' + route;
         }
     };
@@ -94,7 +114,7 @@ module.exports = (function ( $ ){
             }
         } else {
             if ( stateMap.historyHashStates.hasOwnProperty( route ) ) {
-                data = stateMap.historyHashStates[route];
+                data = stateMap.historyHashStates[route].payload;
             }
         }
         return data;

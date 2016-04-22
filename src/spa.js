@@ -88,10 +88,10 @@
 
         run = function () {
             if ( !hasStarted ){
+                hasStarted = true;
                 // Trigger the first hasChange or popState for triggering
                 // the corresponding action for the current URL (support bookmarks)
                 History.run();
-                hasStarted = true;
             } else {
                 throw 'The SPA plugin has started already';
             }
