@@ -43,7 +43,7 @@ module.exports = (function( $ ) {
         if( ! $.isEmptyObject( userOptions.data ) ) {
             userOptions.data = {};
         }
-        return $.extend( true, routeDefaultOptions, userOptions );
+        return $.extend( true, {}, routeDefaultOptions, userOptions );
     };
 
     _checkRoute = function ( route ) {
@@ -96,7 +96,8 @@ module.exports = (function( $ ) {
                 routeCopy.callback,
                 {
                     shouldTriggerStateUpdate : routeCopy.shouldTriggerStateUpdate,
-                    useHistoryStateFallback : routeCopy.useHistoryStateFallback
+                    useHistoryStateFallback : routeCopy.useHistoryStateFallback,
+                    data : routeCopy.data
                 }
             );
         };

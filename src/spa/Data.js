@@ -7,6 +7,7 @@ module.exports = (function ( $ ){
     var defaults = {
         serverUrl : '127.0.0.1:8000',
         format : 'json',
+        contentType : 'application/json; charset=utf-8',
         data : {},
         timeout : 3000,
         password : '',
@@ -24,7 +25,8 @@ module.exports = (function ( $ ){
     _performAjaxRequest = function ( route, method, callback, opts ) {
         $.ajax({
             url : stateMap.serverUrl + route,
-            data : opts.data,
+            data : JSON.stringify( opts.data ),
+            contentType : opts.contentType,
             dataType : opts.format,
             error : function ( jqXHR, textStatus, errorThrown) {
                 var data = {};
@@ -45,7 +47,7 @@ module.exports = (function ( $ ){
             username : opts.username,
             processData : !!( $.isEmptyObject( opts.data ) ),
             success : function ( data, textStatus, jqXHR ) {
-                // The data needs to be an object for the state,
+                // The data needs to be an object for the state storing in the HTML5 History-API,
                 // so it needs to be mapped into one because data could be also an array or string
                 var stateData = {
                     payload : data
@@ -76,7 +78,7 @@ module.exports = (function ( $ ){
     performRequest = function ( route, method, callback, options ){
         // validate options for the AJAX request here
         if ( $.inArray( method.toUpperCase(), allowedMethods ) >= 0 ) {
-            var opts = $.extend( true, stateMap, options );
+            var opts = $.extend( true, {}, stateMap, options );
 
             if ( callback !== null && typeof callback === 'function' ) {
                 _performAjaxRequest( route, method, callback, opts );
