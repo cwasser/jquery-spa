@@ -5,21 +5,31 @@ module.exports = (function ( $ ){
     'use strict';
     //------------------------- BEGIN MODULE SCOPE VARIABLES ------------------------------------
     var defaults = {
-        serverUrl : '127.0.0.1:8000',
-        format : 'json',
-        contentType : 'application/json; charset=utf-8',
-        data : {},
-        timeout : 3000,
-        password : '',
-        username : ''
-    },
+            serverUrl : '127.0.0.1:8000',
+            format : 'json',
+            contentType : 'application/json; charset=utf-8',
+            data : {},
+            timeout : 3000,
+            password : '',
+            username : '',
+            allowedMethods : ['GET', 'POST', 'PUT', 'DELETE']
+        },
         stateMap = $.extend( true, {}, defaults),
-        allowedMethods = ['GET', 'POST', 'PUT', 'DELETE'],
+        settablePropertyMap = {
+            serverUrl : true,
+            format : true,
+            contentType : true,
+            data : false,
+            timeout : true,
+            password : true,
+            username : true,
+            allowedMethods : false
+        },
+
         History = require('./History'),
+        Util = require('./Util'),
 
-        configured = false,
-
-        configModule, performRequest, _performAjaxRequest, isConfigured;
+        configModule, performRequest, _performAjaxRequest;
     //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
     //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
     _performAjaxRequest = function ( route, method, callback, opts ) {
@@ -77,7 +87,7 @@ module.exports = (function ( $ ){
     //------------------------- BEGIN PUBLIC METHODS --------------------------------------------
     performRequest = function ( route, method, callback, options ){
         // validate options for the AJAX request here
-        if ( $.inArray( method.toUpperCase(), allowedMethods ) >= 0 ) {
+        if ( $.inArray( method.toUpperCase(), stateMap.allowedMethods ) >= 0 ) {
             var opts = $.extend( true, {}, stateMap, options );
 
             if ( callback !== null && typeof callback === 'function' ) {
@@ -89,26 +99,20 @@ module.exports = (function ( $ ){
         return false;
     };
 
-    isConfigured = function () {
-        return configured;
-    };
-
     configModule = function ( options ) {
         if ( typeof options !== 'object' || options === null ) {
             throw 'SPA Router needs a JavaScript Object to be configured';
         }
 
-        stateMap = $.extend( true, stateMap, options );
-        console.log('configModule: successfully configurated');
-
-        if ( !configured ) {
-            configured = true;
-        }
+        Util.setStateMap({
+            stateMap : stateMap,
+            settablePropertyMap : settablePropertyMap,
+            inputMap : options
+        });
     };
     //------------------------- END PUBLIC METHODS ----------------------------------------------
     return {
         configModule : configModule,
-        isConfigured : isConfigured,
         performRequest : performRequest
     };
 }( window.jQuery ));

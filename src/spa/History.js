@@ -1,25 +1,28 @@
 /**
  * Created by cwasser on 09.04.16.
  */
-
-var _ = require('lodash');
-
 module.exports = (function ( $ ){
     'use strict';
     //------------------------- BEGIN MODULE SCOPE VARIABLES ------------------------------------
     var defaults = {
         hasHistoryApi : !!(window.history && history.pushState),
-        location : typeof window !== 'undefined' ? window.location : null,
         history : !!(window.history && history.pushState) ? window.history : null,
-        useHistoryApi : true,
+        useHistoryApi : !!(window.history && history.pushState),
         historyHashStates : {}
-    },
+        },
         stateMap = $.extend( true, {}, defaults),
+        settablePropertyMap = {
+            useHistoryApi : true,
+            history : false,
+            historyHashStates : false,
+            hasHistoryApi : false
+        },
 
-        configured = false,
+        started = false,
+        Util = require('./Util'),
 
         _onLocationChange, _shouldUpdateCurrentLocation, _loadRoute,
-        configModule, isConfigured, updateCurrentState, getDataForCurrentState, navigate, run;
+        configModule, isStarted, updateCurrentState, getDataForCurrentState, navigate, run;
     //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
     //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
     _loadRoute = function ( route ) {
@@ -76,12 +79,15 @@ module.exports = (function ( $ ){
     //------------------------- END EVENT METHODS -----------------------------------------------
     //------------------------- BEGIN PUBLIC METHODS --------------------------------------------
     run = function () {
-        _onLocationChange();
+        if ( !started ) {
+            started = true;
+            _onLocationChange();
 
-        if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ){
-            $(window).trigger('popstate');
-        } else {
-            $(window).trigger('hashchange');
+            if ( stateMap.useHistoryApi && stateMap.hasHistoryApi ){
+                $(window).trigger('popstate');
+            } else {
+                $(window).trigger('hashchange');
+            }
         }
     };
 
@@ -133,8 +139,8 @@ module.exports = (function ( $ ){
         return false;
     };
 
-    isConfigured = function () {
-        return configured;
+    isStarted = function () {
+        return started;
     };
 
     configModule = function ( options ) {
@@ -142,17 +148,17 @@ module.exports = (function ( $ ){
             throw "SPA History needs a JavaScript Object to be configured";
         }
 
-        stateMap = $.extend( true, stateMap, options );
-        console.log("configModule: successfully configurated");
-
-        if ( !configured ) {
-            configured = true;
-        }
+        // Set stateMap by the given options
+        Util.setStateMap({
+            stateMap : stateMap,
+            settablePropertyMap : settablePropertyMap,
+            inputMap : options
+        });
     };
     //------------------------- END PUBLIC METHODS ----------------------------------------------
     return {
         configModule : configModule,
-        isConfigured : isConfigured,
+        isStarted : isStarted,
         navigate : navigate,
         getDataForCurrentState : getDataForCurrentState,
         updateCurrentState : updateCurrentState,

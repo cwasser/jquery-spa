@@ -7,25 +7,29 @@ module.exports = (function( $ ) {
     'use strict';
     //----------------- BEGIN MODULE SCOPE VARIABLES ----------------------
     var defaults = {
-            routes : []
+            routes : [],
+            routeDefaultOptions : {
+                isResource : false,
+                httpMethod : 'GET',
+                shouldTriggerStateUpdate : false,
+                useHistoryStateFallback : false,
+                data : {}
+            }
         },
         stateMap = $.extend( true, {}, defaults),
-        routeDefaultOptions = {
-            isResource : false,
-            httpMethod : 'GET',
-            shouldTriggerStateUpdate : false,
-            useHistoryStateFallback : false,
-            data : {}
+        settablePropertyMap = {
+            routes : false,
+            routeDefaultOptions : false
         },
-        configured = false,
 
         Data = require('./Data'),
         History = require('./History'),
+        Util = require('./Util'),
 
         _mergeRouteOptions, _checkRoute, _findRoute, _getRoute, _performDataRequest, _wrapCallbackForResource,
 
         navigate, createResource, updateResource, deleteResource,
-        addRoute, removeRoute, isConfigured, configModule;
+        addRoute, removeRoute, configModule;
 
     //----------------- END MODULE SCOPE VARIABLES ------------------------
     //----------------- BEGIN INTERNAL METHODS ----------------------------
@@ -43,7 +47,7 @@ module.exports = (function( $ ) {
         if( ! $.isEmptyObject( userOptions.data ) ) {
             userOptions.data = {};
         }
-        return $.extend( true, {}, routeDefaultOptions, userOptions );
+        return $.extend( true, {}, stateMap.routeDefaultOptions, userOptions );
     };
 
     _checkRoute = function ( route ) {
@@ -201,29 +205,22 @@ module.exports = (function( $ ) {
         }
     };
 
-    isConfigured = function () {
-        return configured;
-    };
-
     // --------------------- BEGIN CONFIG ---------------------------------
     configModule = function ( options ) {
         if ( typeof options !== 'object' || options === null ) {
             throw 'SPA Router needs a JavaScript Object to be configured';
         }
 
-        stateMap = $.extend( true, stateMap, options );
-
-        if ( !configured ) {
-            configured = true;
-        }
-
-        console.log('configModule: successfully configurated');
+        Util.setStateMap({
+            stateMap : stateMap,
+            settablePropertyMap : settablePropertyMap,
+            inputMap : options
+        });
     };
     //----------------- END PUBLIC METHODS --------------------------------
 
     return {
         configModule : configModule,
-        isConfigured : isConfigured,
         navigate : navigate,
         createResource : createResource,
         updateResource : updateResource,
