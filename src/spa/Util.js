@@ -1,6 +1,11 @@
 /**
  * Created by cwasser on 23.04.16.
  */
+/**
+ * spa/Util.js
+ * Component for common utility functions within the jQuery SPA plugin.
+ * @type {{setStateMap}}
+ */
 module.exports = (function () {
     'use strict';
     //----------------- BEGIN MODULE SCOPE VARIABLES ----------------------
