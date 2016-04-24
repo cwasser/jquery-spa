@@ -4,10 +4,11 @@
 var _ = require('lodash');
 /**
  * spa/Router.js
- * This component is responsible for the routing within the jQuery SPA plugin.
+ * @description This component is responsible for the routing within the jQuery SPA plugin.
  * It will dispatch routes to callbacks and is the only entry point for all routes. It is communicating
  * with the jQuery SPA History and jQuery SPA Data components to do AJAX requests or manipulate the URL / History
  * if needed.
+ * @author Christian Wasser <admin@chwasser.de>
  * @type {{configModule, navigate, createResource, updateResource, deleteResource, addRoute, removeRoute}}
  */
 module.exports = (function( $ ) {
@@ -41,10 +42,10 @@ module.exports = (function( $ ) {
     //----------------- END MODULE SCOPE VARIABLES ------------------------
     //----------------- BEGIN INTERNAL METHODS ----------------------------
     /**
-     * Purpose  : Returns the final optional route options for a single route and makes
+     * @description Returns the final optional route options for a single route and makes
      *      sure that each necessary property is set for a route.
      * @return object the merged options, default route options overwritten by the user
-     * @param userOptions       - An object with user options for a single route
+     * @param {object} userOptions       - An object with user options for a single route
      * @private
      */
     _mergeRouteOptions = function ( userOptions ) {
@@ -58,9 +59,9 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : Check if a route is matching a regex to disallow malformed routes in
+     * @description Check if a route is matching a regex to disallow malformed routes in
      *      this component.
-     * @param route         - The route string to be checked.
+     * @param {string} route - The route string to be checked.
      * @returns {boolean}   - If the route matches with the internal regex.
      *      * true          - The route string matches.
      *      * false         - The route does not match with the regex.
@@ -72,13 +73,13 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : Find the index of the given route and httpMethod string and returns it.
-     * @return int          - The index of the route.
+     * @description Find the index of the given route and httpMethod string and returns it.
+     * @return {int}        - The index of the route.
      *      * -1            - The component does not contain the given route.
      *      * 0 ... n       - The index of the route object in this component.
      * @private
-     * @param route         - Any route string to look for.
-     * @param httpMethod    - Any HTTP method connected with the given route, allowed methods are
+     * @param {string} route - Any route string to look for.
+     * @param {string} httpMethod    - Any HTTP method connected with the given route, allowed methods are
      *                  findable within the jQuery SPA Data component.
      */
     _findRoute = function ( route, httpMethod ) {
@@ -93,13 +94,13 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : Get a deep copy of a route object of this component for the given route string
+     * @description Get a deep copy of a route object of this component for the given route string
      *      and HTTP method string.
-     * @return object       - A copy of the route object with the given route and httpMethod or
+     * @return {object}     - A copy of the route object with the given route and httpMethod or
      *                  an empty javascript object if the component does not contain a corresponding
      *                  object.
-     * @param route         - Any route string to look for to deliver the route object.
-     * @param httpMethod    - Any HTTP method connected with the given route, allowed methods are
+     * @param {string} route    - Any route string to look for to deliver the route object.
+     * @param {string} httpMethod - Any HTTP method connected with the given route, allowed methods are
      *                  findable within the jQuery SPA Data component.
      * @private
      */
@@ -112,10 +113,10 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This method will wrap the callback of the given route object into one more callback,
+     * @description This method will wrap the callback of the given route object into one more callback,
      *      to perform an AJAX request via the jQuery SPA Data component.
-     * @param routeObj      - The route object from the state map of this component.
-     * @returns {Function}  - The wrapped callback for the given route object, which is ready to perform
+     * @param {object} routeObj     - The route object from the state map of this component.
+     * @returns {Function}          - The wrapped callback for the given route object, which is ready to perform
      *                  an AJAX request on call of the callback.
      * @private
      */
@@ -139,11 +140,11 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : Will wrap the callback of the given route object into an AJAX callback. It also
+     * @description Will wrap the callback of the given route object into an AJAX callback. It also
      *      checks additionally the HTTP method of the route object to set some History specific
      *      flags. This method is used by all data related functions of the Router component.
-     * @param routeObj  - The route object from the state map of this component.
-     * @param data      - Additional data javascript object, which should be used as data for the
+     * @param {object} routeObj     - The route object from the state map of this component.
+     * @param {object} data         - Additional data javascript object, which should be used as data for the
      *              AJAX request.
      * @returns {Function}  - The wrapped callback for the given route object, which is ready
      *              to perform an AJAX request on call of the callback.
@@ -163,7 +164,7 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * This listener will be registered instantly and will listen on specific events from the
+     * @description This listener will be registered instantly and will listen on specific events from the
      * jQuery SPA History component. When the event it triggered, this will execute the callback
      * after the History manipulation.
      */
@@ -181,10 +182,10 @@ module.exports = (function( $ ) {
     //----------------- END INTERNAL METHODS ------------------------------
     //----------------- BEGIN PUBLIC METHODS ------------------------------
     /**
-     * Purpose  : This method will navigate to the given route string, this means that it will
+     * @description This method will navigate to the given route string, this means that it will
      *      change the URL and use the jQuery SPA History component. Additionally it will perform
      *      an AJAX GET request depending on the configuration for the given route in this component.
-     * @param route         - The route string to navigate to.
+     * @param {string} route            - The route string to navigate to.
      */
     navigate = function ( route ) {
         if ( _findRoute( route, 'GET' ) >= 0 ) {
@@ -196,13 +197,13 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will get an resource from the, in the jQuery SPA Data component
+     * @description This function will get an resource from the, in the jQuery SPA Data component
      *      configured, server. This requires an existing configuration for the given route within
      *      the Router component. If a route for GET with the given route string is configured,
      *      it will perform an AJAX request but no jQuery SPA History function call at all.
      *      Additionally it will modify automatically the copy of the route configuration to
      *      prevent any jQuery SPA History calls.
-     * @param route             - The route string for getting the resource.
+     * @param {string} route                - The route string for getting the resource.
      */
     getResource = function ( route ) {
         var routeObj = _getRoute( route, 'GET' ),
@@ -223,12 +224,12 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will create an resource on the, in the jQuery SPA Data component
+     * @description This function will create an resource on the, in the jQuery SPA Data component
      *      configured, server. This requires an existing configuration for the given route within
      *      the Router component. If a route for POST with the given route string is configured,
      *      it will perform an AJAX request but no jQuery SPA History function call at all.
-     * @param route         - The route string for creating the resource.
-     * @param data          - An javascript object containing the data to use for the AJAX request.
+     * @param {string} route            - The route string for creating the resource.
+     * @param {object} data             - An javascript object containing the data to use for the AJAX request.
      */
     createResource = function ( route, data ) {
         var routeObj, execute;
@@ -246,12 +247,12 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will update an resource on the, in the jQuery SPA Data component
+     * @description This function will update an resource on the, in the jQuery SPA Data component
      *      configured, server. This requires an existing configuration for the given route within
      *      the Router component. If a route for PUT with the given route string is configured,
      *      then it will perform an AJAX request but no jQuery SPA History function call at all.
-     * @param route         - The route string for updating the resource.
-     * @param data          - An javascript object containing the data to use for the AJAX request.
+     * @param {string} route            - The route string for updating the resource.
+     * @param {object} data             - An javascript object containing the data to use for the AJAX request.
      */
     updateResource = function ( route, data ) {
         var routeObj, execute;
@@ -268,11 +269,11 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will delete an resource on the, in the jQuery SPA Data component
+     * @description This function will delete an resource on the, in the jQuery SPA Data component
      *      configured, server. This requires an existing configuration for the given route within
      *      the Router component. If a route for DELETE with the given route string is configured,
      *      then it will perform an AJAX request but no jQuery History function call at all.
-     * @param route         - The route for the resource to delete.
+     * @param {string} route            - The route for the resource to delete.
      */
     deleteResource = function ( route ) {
         var routeObj = _getRoute( route, 'DELETE'),
@@ -286,15 +287,15 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will add a new route configuration to the jQuery SPA Router
+     * @description This function will add a new route configuration to the jQuery SPA Router
      *      component. Required parameters are the route string and the corresponding callback
      *      for this route. Optional you can also give some options to define optional things
      *      for the new route configuration. By default it will always be an simple GET route
      *      without any AJAX calls.
-     * @param route         - The route string for the new configuration.
-     * @param callback      - The callback function which should be executed after executing
+     * @param {string} route            - The route string for the new configuration.
+     * @param {Function} callback       - The callback function which should be executed after executing
      *      the route via Router.navigate() or any other resource related calls.
-     * @param options       - Optional options javascript object for the new route configuration.
+     * @param {object} options          - Optional options javascript object for the new route configuration.
      *      By default it will use a GET route without any data retrieval. Allowed options are:
      *      * options.isResource : boolean      - If true, then it will perform an AJAX request
      *                      on executing the route.
@@ -345,10 +346,10 @@ module.exports = (function( $ ) {
     };
 
     /**
-     * Purpose  : This function will remove an existing route configuration from the jQuery
+     * @description This function will remove an existing route configuration from the jQuery
      *      SPA Router component.
-     * @param route         - The route string to identify the route configuration to remove.
-     * @param httpMethod    - Additional HTTP method string to identify the route configuration
+     * @param {string} route            - The route string to identify the route configuration to remove.
+     * @param {string} httpMethod       - Additional HTTP method string to identify the route configuration
      *      to remove.
      */
     removeRoute = function ( route, httpMethod ) {
@@ -360,10 +361,10 @@ module.exports = (function( $ ) {
 
     // --------------------- BEGIN CONFIG ---------------------------------
     /**
-     * Purpose  : This function will configure the jQuery SPA Router component with some
+     * @description This function will configure the jQuery SPA Router component with some
      *      options from outside. A call of this function is not required, because by default
      *      the component will contain a default configuration.
-     * @param options       - An javascript object which contains the options to configure
+     * @param {object} options          - An javascript object which contains the options to configure
      *      this component. So far there is no existing configuration necessary and also not
      *      available for this component.
      */
