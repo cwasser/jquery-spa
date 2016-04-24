@@ -1,6 +1,6 @@
 {
   "name": "jquery.spa",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "title": "jQuery Single Page Page Application Plugin",
   "description": "jQuery Plugin which provides simple SPA functionality for your website",
   "main": "src/jquery.spa.js",

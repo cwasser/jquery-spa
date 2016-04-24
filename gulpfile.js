@@ -39,7 +39,7 @@ var DEST = './dist/',
         entries : SRC_FILES,
         debug : true
     },
-    VERSION = 'v0.2.0',
+    VERSION = 'v0.4.0',
     TARGET_FILENAME = 'jquery.spa.js';
 
 var logTime = function(){

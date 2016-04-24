@@ -5,24 +5,44 @@
  * Copyright (c) 2016 Christian Wasser
  * Licensed under the MIT license.
  */
-(function ( $ ) {
+var _ = require('lodash');
 
+(function ( $, _ ) {
+    'use strict';
     // First check the hard dependencies for this plugin
-    if ( typeof $ !== "function" || $ === undefined ){
-        throw "jQuery.spa has a hard dependency on jQuery";
+    if ( typeof $ !== 'function' || $ === undefined ) {
+        throw 'jQuery.spa has a hard dependency on jQuery';
     }
 
+    if ( typeof _ !== 'function' || _ === undefined ) {
+        throw 'jQuery.spa has a hard dependency on lodash';
+    }
+
+    /**
+     * @description This is the main entry point for the plugin usage. It offers the public API for the jQuery SPA plugin
+     *      usage and proxies the public functions of the internal components. The most important internal
+     *      component are the Data, the History and the Router component.
+     *      The plugin has dependencies to jQuery and the lodash library for some utility functions.
+     *      The plugin provides simple Single Page Application functionality like browser history support,
+     *      dynamic data retrieval, URL manipulation without any reload, application state management within
+     *      the History component, a Router component as a dispatcher for routes to callbacks. All components
+     *      contain default values and are configurable.
+     * @author Christian Wasser <admin@chwasser.de>
+     * @type {{configModule, configHistory, configData, configRouter, addRoutes, addRoute, removeRoute, navigate, getResource, createResource, updateResource, deleteResource, run}}
+     */
     $.spa =  (function () {
         //------------------------- BEGIN MODULE SCOPE VARIABLES ------------------------------------
+        // Load internal components
         var Data = require('./spa/Data'),
             History = require('./spa/History'),
             Router = require('./spa/Router'),
 
+            // component started?
             hasStarted = false,
 
             configModule, configHistory, configRouter, configData,
             addRoutes, addRoute, removeRoute,
-            navigate, createResource, updateResource, deleteResource,
+            navigate, createResource, updateResource, deleteResource, getResource,
             run;
         //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
         //------------------------- BEGIN INTERNAL METHODS ------------------------------------------
@@ -31,12 +51,14 @@
         //------------------------- END EVENT METHODS -----------------------------------------------
         //------------------------- BEGIN PUBLIC METHODS --------------------------------------------
         /**
-         * This function will navigate to the given route.
-         * Depending on the routing configuration will additionally try to fetch
-         * additional information for the route via GET from the in the Data module
-         * configured server.
-         * @throws exception if the spa is not started yet (spa.run())
-         * @param route
+         * @see <spa/Router.js>#navigate(route)
+         * @see <spa/History.js>#navigate(route)
+         * @description This function will navigate to the given route.
+         *      Depending on the routing configuration will additionally try to fetch
+         *      additional information for the route via GET from the in the Data module
+         *      configured server.
+         * @throws exception        - If the SPA plugin is not started yet (spa.run()).
+         * @param {string} route
          */
         navigate = function ( route ) {
             if ( hasStarted ) {
@@ -46,6 +68,14 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#createResource(route,data)
+         * @description This function will create a new resource on the, in the plugin configured, server.
+         *      It will use an AJAX request with the 'POST' method. It does no manipulation of the history nor URL.
+         * @param {string} route            - The route string to identify the resource on the server.
+         * @param {object} data             - The data object which should be posted to the server.
+         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
+         */
         createResource = function ( route, data ) {
             if ( hasStarted ) {
                 Router.createResource( route, data );
@@ -54,6 +84,14 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#updateResource(route,data)
+         * @description This function will update an existing resource on the, in the plugin configured, server.
+         *      It will use an AJAX request with the 'PUT' method. It does no manipulation of the history nor of the URL.
+         * @param {string} route            - The route string to identify the resource on the server.
+         * @param {object} data             - The data object with which the resource should be updated.
+         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
+         */
         updateResource = function ( route, data ) {
             if ( hasStarted ) {
                 Router.updateResource( route, data );
@@ -62,6 +100,13 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#deleteResource(route)
+         * @description This function will delete an existing resource on the, in the plugin configured, server.
+         *      It will use an AJAX request with the 'DELETE' method. It does no manipulation of the history nor of the URL.
+         * @param {string} route            - The route which is identifying the resource on the server.
+         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
+         */
         deleteResource = function ( route ) {
             if ( hasStarted ) {
                 Router.deleteResource( route );
@@ -70,6 +115,30 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#getResource(route)
+         * @description This function will get an existing resource on the, in the plugin configured, server.
+         *      It will use an AJAX request with the 'GET' method. It does no manipulation of the history nor of the URL.
+         * @param {string} route            - The route which is identifying the resource on the server.
+         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
+         */
+        getResource = function ( route ) {
+            if ( hasStarted ) {
+                Router.getResource( route );
+            } else {
+                throw 'Method spa.getResource() can not be called without starting the plugin, please call spa.run() before';
+            }
+        };
+
+        /**
+         * @see also <spa/History.js>#run()
+         * @description This function will start the whole plugin, it also possible to do configurations of components
+         *      or adding routes after the plugin has started. It will also call the History component to start listening
+         *      on the browser history/URL events. After calling this function it is not anymore possible to
+         *      change the History configuration. This means the plugin will either use the HTML5 History-API
+         *      or the hash based URL.
+         * @throws exception                - If the SPA plugin is already started.
+         */
         run = function () {
             if ( !hasStarted ){
                 hasStarted = true;
@@ -81,19 +150,46 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#addRoute(route,callback,options)
+         * @description This function will add a new route configuration to the SPA plugin. Necessary
+         *      parameters are the route and the callback, which should be added. Options are optional, by
+         *      default the Plugin will assign some defaults to the route configuration.
+         *      httpMethod : 'GET',
+         *      isResource : false,
+         *      shouldTriggerStateUpdate : false,
+         *      useHistoryStateFallback : false
+         * @param {string} route            - The new route which should be added.
+         * @param {Function} callback       - The callback function which should be executed if the
+         *      route is executed via the SPA public API.
+         * @param {object} options          - Optional options for the new route configuration.
+         *      Allowed options are:
+         *      * isResource : {boolean}    - This flag defines if the route is connected to an
+         *          resource on the configured web server. By default false.
+         *      * httpMethod : {string}     - This string defines the connected HTTP method for
+         *          the route. By default it is set to 'GET'.
+         *      * shouldTriggerStateUpdate : {boolean} - This flag is only valid for routes with
+         *          isResource : true and httpMethod : 'GET'. It will trigger an state update
+         *          of the history state for the given route if the data retrieval was successful
+         *          and is executed before the callback takes in.
+         *      * useHistoryStateFallback : {boolean}  - This flag is only valid for routes with
+         *          isResource : true and httpMethod : 'GET'. It will use the History state for the
+         *          given route if an AJAX request fails to retrieve the latest data from the state.
+         *          After this it will execute the callback.
+         */
         addRoute = function ( route, callback, options ) {
             // Simply proxy the Router.addRoute() call
             Router.addRoute( route, callback, options );
-            //allow chaining of addRoute
-            return this;
         };
 
         /**
-         * Purpose  : This function allows the user of the plugin to direct add more than one
+         * @see <spa/Router.js>#addRoute(route,callback,options)
+         * @see <spa.js>#addRoute(route,callback,options)
+         * @description This function allows the user of the plugin to direct add more than one
          *      route configuration as an array of route configurations to the plugin. Internally
          *      it will call the jQuery.spa.addRoute() method for each route configuration object.
-         * @param routes        - An array of route configuration objects. For a single route
-         *                  configuration object @see jQuery.spa.addRoute(...).
+         * @param {array} routes            - An array of route configuration objects.
+         *      For a single route configuration object @see <spa.js>#addRoute(route,callback,options).
          */
         addRoutes = function ( routes ) {
             if ( routes instanceof Array ) {
@@ -120,52 +216,85 @@
             }
         };
 
+        /**
+         * @see <spa/Router.js>#removeRoute(route,httpMethod)
+         * @description This function will remove an existing route configuration from the jQuery
+         *      SPA plugin. It simply proxies the Router.js#removeRoute() function.
+         * @param {string} route            - The route which identifies the configuration which should be deleted.
+         * @param {string} httpMethod       - The HTTP method connected to the route to identify the to removed configuration.
+         */
         removeRoute = function ( route, httpMethod ) {
             // Simply proxy the Router.removeRoute() call
             Router.removeRoute( route, httpMethod );
-            //allow chaining of removeRoute
-            return this;
         };
 
         /**
-         * Purpose  : This function proxies the History.configModule function, because the History
+         * @see <spa/History.js>#configModule(options)
+         * @description This function proxies the History.configModule function, because the History
          *      component should not be accessible from outside of the plugin at all.
          * @param options       - A javascript object which will configure the History component, which is
-         *                  responsible for all browser history actions and URL manipulation. For further information
-         *                  about the available History configuration @see History::configModule (src/History.js).
+         *      responsible for all browser history actions and URL manipulation. For further information
+         *      about the available History configuration @see <spa/History.js>#configModule(options).
+         * @example
+         *      jQuery.spa.configHistory({
+         *          useHistoryApi : true
+         *      });
          */
         configHistory = function ( options ) {
             History.configModule( options );
         };
 
         /**
-         * Purpose  : This function proxies the Router.configModule function, because the Router
+         * @see <spa/Router.js>#configModule(options)
+         * @description This function proxies the Router.configModule function, because the Router
          *      component should not be accessible from outside of the plugin at all.
          * @param options       - A javascript object which will configure the Router component
-         *                  for further information about the available Router configuration @see Router::configModule()
-         *                  (src/Router.js).
+         *      for further information about the available Router configuration @see <spa/Router.js>#configModule(options).
+         * @example
+         *      jQuery.spa.configRouter({
+         *
+         *      });
          */
         configRouter = function ( options ) {
             Router.configModule( options );
         };
 
         /**
-         * Purpose  : This function proxies the Data.configModule function, because the Data
+         * @see <spa/Data.js>#configModule(options)
+         * @description This function proxies the Data.configModule function, because the Data
          *      component should not be accessible from outside of the plugin at all.
          * @param options       - A javascript object which will configure the Data component, which is
-         *                  responsible for all asynchronous server requests. For further information about the
-         *                  available Data configuration @see Data::configModule (src/Data.js).
+         *      responsible for all asynchronous server requests. For further information about the
+         *      available Data configuration @see <spa/Data.js>#configModule(options).
+         * @example
+         *      jQuery.spa.configData({
+         *          serverUrl : 'http://localhost:8000/any/api',
+         *          contentType : 'application/json; charset=utf-8',
+         *          format : 'json',
+         *          username : 'example',
+         *          password : 'example',
+         *          timeout : 3000
+         *      });
          */
         configData = function ( options ) {
             Data.configModule( options );
         };
 
         /**
-         * Purpose  : This function will configure all components of the jQuery spa plugin in once.
+         * @see <spa.js>#configRouter(options)
+         * @see <spa.js>#configData(options)
+         * @see <spa.js>#configHistory(options)
+         * @description This function will configure all components of the jQuery spa plugin in once.
          * @param options      - An javascript object which contains the whole plugin configuration
-         *      * options.routerConfig : {}    - @see jQuery.spa.configRouter( options ).
-         *      * options.dataConfig : {}    - @see jQuery.spa.configData( options ).
-         *      * options.historyConfig : {} - @see jQuery.spa.configHistory( options ).
+         *      * options.routerConfig : {}     - @see <spa.js>#configRouter(options).
+         *      * options.dataConfig : {}       - @see <spa.js>#configData(options).
+         *      * options.historyConfig : {}    - @see <spa.js>#configHistory(options).
+         * @example
+         *      jQuery.spa.configModule({
+         *          historyConfig : { @see <spa.js>#configHistory(options) },
+         *          dataConfig : { @see <spa.js>#configData(options) },
+         *          routerConfig : { @see <spa.js>#configRouter(options) }
+         *      });
          */
         configModule = function ( options ){
             var historyConfigName = 'historyConfig',
@@ -206,7 +335,8 @@
             removeRoute : removeRoute,
             // Navigate to a configured route (can also contain a GET request)
             navigate : navigate,
-            // POST, PUT and DELETE request via AJAX
+            // GET, POST, PUT and DELETE request via AJAX
+            getResource : getResource,
             createResource : createResource,
             updateResource : updateResource,
             deleteResource : deleteResource,
@@ -214,5 +344,5 @@
             run : run
         };
     }());
-}( window.jQuery ));
+}( window.jQuery, _ ));
 
