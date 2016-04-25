@@ -41,7 +41,7 @@ var _ = require('lodash');
             hasStarted = false,
 
             configModule, configHistory, configRouter, configData,
-            addRoutes, addRoute, removeRoute,
+            addRoutes, addRoute, removeRoute, hasRoute,
             navigate, createResource, updateResource, deleteResource, getResource,
             run;
         //------------------------- END MODULE SCOPE VARIABLES --------------------------------------
@@ -229,6 +229,24 @@ var _ = require('lodash');
         };
 
         /**
+         * @see <spa/Router.js>#hasRoute(route,httpMethod)
+         * @description This function will check if the jQuery SPA plugin contains already an
+         *      existing route configuration for the given route and HTTP method.
+         * @param {string} route            - The route to looking for in the configuration.
+         * @param {string} httpMethod       - The HTTP method to looking for in the configuration connected
+         *      to the Route.
+         * @returns {boolean}
+         *      * true                      - The jQuery SPA plugin contains an existing route configuration
+         *          for the given route and HTTP method.
+         *      * false                     - The jQuery SPA plugin does not contain an existing route
+         *          configuration for the given route and HTTP method.
+         */
+        hasRoute = function ( route, httpMethod ) {
+            // Simply proxy the Router.hasRoute() call
+            return Router.hasRoute( route, httpMethod );
+        };
+
+        /**
          * @see <spa/History.js>#configModule(options)
          * @description This function proxies the History.configModule function, because the History
          *      component should not be accessible from outside of the plugin at all.
@@ -333,6 +351,7 @@ var _ = require('lodash');
             addRoutes : addRoutes,
             addRoute : addRoute,
             removeRoute : removeRoute,
+            hasRoute : hasRoute,
             // Navigate to a configured route (can also contain a GET request)
             navigate : navigate,
             // GET, POST, PUT and DELETE request via AJAX

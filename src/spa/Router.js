@@ -37,7 +37,7 @@ module.exports = (function( $ ) {
         _mergeRouteOptions, _checkRoute, _findRoute, _getRoute, _performDataRequest, _wrapCallbackForResource,
 
         navigate, createResource, updateResource, deleteResource, getResource,
-        addRoute, removeRoute, configModule;
+        addRoute, removeRoute, hasRoute, configModule;
 
     //----------------- END MODULE SCOPE VARIABLES ------------------------
     //----------------- BEGIN INTERNAL METHODS ----------------------------
@@ -346,6 +346,23 @@ module.exports = (function( $ ) {
     };
 
     /**
+     * @description This function will check if the Router component contains already an
+     *      existing route entry for the given route string and HTTP method.
+     * @param {string} route            - The route to looking for in the configuration.
+     * @param {string} httpMethod       - The connected HTTP method to the route to looking for
+     *      the configuration in the Router component.
+     * @returns {boolean}
+     *      * true                      - The Router component contains an existing route entry
+     *          for the given route and HTTP method.
+     *      * false                     - The Router component does not contain yet an existing
+     *          route configuration for the given route and HTTP method.
+     */
+    hasRoute = function ( route, httpMethod ) {
+        var found = _findRoute( route, httpMethod );
+        return found >= 0;
+    };
+
+    /**
      * @description This function will remove an existing route configuration from the jQuery
      *      SPA Router component.
      * @param {string} route            - The route string to identify the route configuration to remove.
@@ -389,6 +406,7 @@ module.exports = (function( $ ) {
         updateResource : updateResource,
         deleteResource : deleteResource,
         addRoute : addRoute,
-        removeRoute : removeRoute
+        removeRoute : removeRoute,
+        hasRoute : hasRoute
     };
 }( window.jQuery ));

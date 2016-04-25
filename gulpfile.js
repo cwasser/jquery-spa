@@ -39,8 +39,8 @@ var DEST = './dist/',
         entries : SRC_FILES,
         debug : true
     },
-    VERSION = 'v0.4.0',
-    TARGET_FILENAME = 'jquery.spa.js';
+    VERSION = 'v1.0.0',
+    TARGET_FILENAME = 'jquery.spa-'+VERSION+'.js';
 
 var logTime = function(){
     var date = new Date();
@@ -62,12 +62,12 @@ gulp.task('browserify', function(){
     stream = bundler.bundle();
 
     return stream.on('error', gutil.log.bind(gutil, logTime() + ' Browserify Error'))
-        .pipe(source(TARGET_FILENAME + '-' + VERSION))
+        .pipe(source(TARGET_FILENAME))
         .pipe(gulp.dest(DEST));
 });
 
 gulp.task('build', ['browserify'],function(){
-    return gulp.src([DEST + TARGET_FILENAME + '-' + VERSION])
+    return gulp.src([DEST + TARGET_FILENAME])
         .pipe(gulp.dest(DEST))
         .pipe(sourcemaps.init({loadMaps: true}))
         .pipe(uglify())
