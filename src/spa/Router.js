@@ -370,8 +370,8 @@ module.exports = (function( $ ) {
      *      to remove.
      */
     removeRoute = function ( route, httpMethod ) {
-        var index;
-        if ( index = _findRoute( route, httpMethod ) >= 0 ) {
+        var index = _findRoute( route, httpMethod );
+        if ( index >= 0 ) {
             stateMap.routes.splice( index, 1 );
         }
     };
