@@ -14,7 +14,7 @@ and also to [jQuery](https://github.com/jquery/jquery) (>= v2.2.0).
 This plugin is developed as an official jQuery plugin. For further information about jQuery plugins
 see https://plugins.jquery.com/.
 
-## What does it and what is inside?
+## What does it do and what is inside?
 The plugin itself is developed with the usage of JavaScript closures and the CommonJS module pattern
 from Node.js. It has also an configured build chain with gulp.
 
