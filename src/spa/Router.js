@@ -154,10 +154,6 @@ module.exports = (function( $ ) {
         if ( typeof data === 'undefined' ) {
             throw 'jQuery SPA Error: Can not perform data retrieval without any data';
         }
-        if ( routeObj.httpMethod.toUpperCase() === 'GET' ) {
-            routeObj.useHistoryStateFallback = true;
-            routeObj.shouldTriggerStateUpdate = true;
-        }
         routeObj.data = data;
 
         return _wrapCallbackForResource( routeObj );
