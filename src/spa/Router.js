@@ -215,7 +215,7 @@ module.exports = (function( $ ) {
             routeObj.shouldTriggerStateUpdate = false;
             routeObj.useHistoryStateFallback = false;
 
-            execute = _performDataRequest( routeObj );
+            execute = _performDataRequest( routeObj, {} );
             execute();
         } else {
             throw 'jQuery SPA Error: No configuration found for the given route';

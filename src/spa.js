@@ -74,14 +74,9 @@ var _ = require('lodash');
          *      It will use an AJAX request with the 'POST' method. It does no manipulation of the history nor URL.
          * @param {string} route            - The route string to identify the resource on the server.
          * @param {object} data             - The data object which should be posted to the server.
-         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
          */
         createResource = function ( route, data ) {
-            if ( hasStarted ) {
-                Router.createResource( route, data );
-            } else {
-                throw 'Method spa.createResource() can not be called without starting the plugin, please call spa.run() before';
-            }
+            Router.createResource( route, data );
         };
 
         /**
@@ -90,14 +85,9 @@ var _ = require('lodash');
          *      It will use an AJAX request with the 'PUT' method. It does no manipulation of the history nor of the URL.
          * @param {string} route            - The route string to identify the resource on the server.
          * @param {object} data             - The data object with which the resource should be updated.
-         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
          */
         updateResource = function ( route, data ) {
-            if ( hasStarted ) {
-                Router.updateResource( route, data );
-            } else {
-                throw 'Method spa.updateResource() can not be called without starting the plugin, please call spa.run() before';
-            }
+            Router.updateResource( route, data );
         };
 
         /**
@@ -105,14 +95,9 @@ var _ = require('lodash');
          * @description This function will delete an existing resource on the, in the plugin configured, server.
          *      It will use an AJAX request with the 'DELETE' method. It does no manipulation of the history nor of the URL.
          * @param {string} route            - The route which is identifying the resource on the server.
-         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
          */
         deleteResource = function ( route ) {
-            if ( hasStarted ) {
-                Router.deleteResource( route );
-            } else {
-                throw 'Method spa.deleteResource() can not be called without starting the plugin, please call spa.run() before';
-            }
+            Router.deleteResource( route );
         };
 
         /**
@@ -120,14 +105,9 @@ var _ = require('lodash');
          * @description This function will get an existing resource on the, in the plugin configured, server.
          *      It will use an AJAX request with the 'GET' method. It does no manipulation of the history nor of the URL.
          * @param {string} route            - The route which is identifying the resource on the server.
-         * @throws exception                - If the SPA plugin is not started yet (spa.run()).
          */
         getResource = function ( route ) {
-            if ( hasStarted ) {
-                Router.getResource( route );
-            } else {
-                throw 'Method spa.getResource() can not be called without starting the plugin, please call spa.run() before';
-            }
+            Router.getResource( route );
         };
 
         /**
