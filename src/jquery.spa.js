@@ -164,12 +164,12 @@ var _ = require('lodash');
 
         /**
          * @see <spa/Router.js>#addRoute(route,callback,options)
-         * @see <spa.js>#addRoute(route,callback,options)
+         * @see <jquery.spa.js>#addRoute(route,callback,options)
          * @description This function allows the user of the plugin to direct add more than one
          *      route configuration as an array of route configurations to the plugin. Internally
          *      it will call the jQuery.spa.addRoute() method for each route configuration object.
          * @param {array} routes            - An array of route configuration objects.
-         *      For a single route configuration object @see <spa.js>#addRoute(route,callback,options).
+         *      For a single route configuration object @see <jquery.spa.js>#addRoute(route,callback,options).
          */
         addRoutes = function ( routes ) {
             if ( routes instanceof Array ) {
@@ -279,19 +279,19 @@ var _ = require('lodash');
         };
 
         /**
-         * @see <spa.js>#configRouter(options)
-         * @see <spa.js>#configData(options)
-         * @see <spa.js>#configHistory(options)
+         * @see <jquery.spa.js>#configRouter(options)
+         * @see <jquery.spa.js>#configData(options)
+         * @see <jquery.spa.js>#configHistory(options)
          * @description This function will configure all components of the jQuery spa plugin in once.
          * @param options      - An javascript object which contains the whole plugin configuration
-         *      * options.routerConfig : {}     - @see <spa.js>#configRouter(options).
-         *      * options.dataConfig : {}       - @see <spa.js>#configData(options).
-         *      * options.historyConfig : {}    - @see <spa.js>#configHistory(options).
+         *      * options.routerConfig : {}     - @see <jquery.spa.js>#configRouter(options).
+         *      * options.dataConfig : {}       - @see <jquery.spa.js>#configData(options).
+         *      * options.historyConfig : {}    - @see <jquery.spa.js>#configHistory(options).
          * @example
          *      jQuery.spa.configModule({
-         *          historyConfig : { @see <spa.js>#configHistory(options) },
-         *          dataConfig : { @see <spa.js>#configData(options) },
-         *          routerConfig : { @see <spa.js>#configRouter(options) }
+         *          historyConfig : { @see <jquery.spa.js>#configHistory(options) },
+         *          dataConfig : { @see <jquery.spa.js>#configData(options) },
+         *          routerConfig : { @see <jquery.spa.js>#configRouter(options) }
          *      });
          */
         configModule = function ( options ){

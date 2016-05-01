@@ -33,7 +33,7 @@ var gulp = require('gulp'),
 
 
 var DEST = './dist/',
-    SRC_FILES = ['./src/spa/Util.js', './src/spa/Data.js', './src/spa/History.js', './src/spa/Router.js','./src/spa.js'],
+    SRC_FILES = ['./src/spa/Util.js', './src/spa/Data.js', './src/spa/History.js', './src/spa/Router.js','./src/jquery.spa.js'],
     SRC_FILES_ALL = ['./src/**/*.js'],
     BROWSERIFY_OPTS = {
         entries : SRC_FILES,
