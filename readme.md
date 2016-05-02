@@ -59,7 +59,7 @@ In your web page:
     $.spa.addRoutes([{...},{...},...]);
     // Start the plugin
     $.spa.run();
-    // Starting using it
+    // Start using it
     $.spa.navigate('route');
     $.spa.getResource('route');
     $.spa.createResource('route', {});
@@ -187,26 +187,27 @@ the new route configuration. The function expects the following parameters:
     callback which are connected to an resource on the server and `function(){}` for routes without
     any resource connection. So an callback which is connected to an server resource will receive the
     following parameters:
-        - data : {object}  - Any response from the server for the AJAX request. This contains the
-            requested data or an empty object, if no data were sent.
-        - jqXHR : {object} - The request object sent by jQuery.ajax(). See [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
-        - textStatus : {string}    - The status text for the request. See [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
-        - errorThrown : {string}   - This will only be passed if an jQuery.ajax() error occurred. See [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
+    - data : {object}  - Any response from the server for the AJAX request. This contains the
+        requested data or an empty object, if no data were sent.
+    - jqXHR : {object} - The request object sent by jQuery.ajax(). See [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
+    - textStatus : {string}    - The status text for the request. See [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
+    - errorThrown : {string}   - This will only be passed if an jQuery.ajax() error occurred. See
+        [jQuery.ajax()](http://api.jquery.com/jquery.ajax/).
         
 * options : {object}        - Optional parameters for the route configuration. Following properties are allowed:
-        - isResource : {boolean}    - This flag defines if the route is connected to an resource on
-            configured server.
-            **Default Value:** `false`
-        - httpMethod : {string}     - This string defines the connected HTTP method for the route and
-            it is used also for the AJAX requests.
-            **Default Value:** `'GET'`
-        - shouldTriggerStateUpdate : {boolean}  - This flag is only valid for routes with the `isResource`
-            flag to `true` and `httpMethod` set to `'GET'`. It will trigger an state update of the history module
-            of the jQuery SPA plugin for the given route if the data retrieval was successful.
-            **Default value:** `false`
-        - useHistoryStateFallback : {boolean}   - This flag is only valid for routes the `isResource` flag to
-            `true` and `httpMethod` set to `'GET'`. It will use the latest history state for the
-            given route if an AJAX request fails to retrieve the data from the state.
+    - isResource : {boolean}    - This flag defines if the route is connected to an resource on
+        configured server.
+        **Default Value:** `false`
+    - httpMethod : {string}     - This string defines the connected HTTP method for the route and
+        it is used also for the AJAX requests.
+        **Default Value:** `'GET'`
+    - shouldTriggerStateUpdate : {boolean}  - This flag is only valid for routes with the `isResource`
+        flag to `true` and `httpMethod` set to `'GET'`. It will trigger an state update of the history module
+        of the jQuery SPA plugin for the given route if the data retrieval was successful.
+        **Default value:** `false`
+    - useHistoryStateFallback : {boolean}   - This flag is only valid for routes the `isResource` flag to
+        `true` and `httpMethod` set to `'GET'`. It will use the latest history state for the
+        given route if an AJAX request fails to retrieve the data from the state.
 
 **Example usage:**
 ```javascript
